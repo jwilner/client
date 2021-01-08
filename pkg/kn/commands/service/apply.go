@@ -69,7 +69,6 @@ func NewServiceApplyCommand(p *commands.KnParams) *cobra.Command {
 			}
 
 			var service *servingv1.Service
-			applyFlags.RevisionName = ""
 			if applyFlags.Filename == "" {
 				service, err = constructService(cmd, applyFlags, name, namespace)
 			} else {

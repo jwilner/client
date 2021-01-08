@@ -1116,5 +1116,9 @@ Ignore PRs:
 | Add traffic flags to `service apply`
 | https://github.com/knative/client/pull/1187[#1187]
 
+| 🐛
+| Permit revision name in `service apply`
+| https://github.com/knative/client/pull/1185[#1185]
+
 |===
 ////
