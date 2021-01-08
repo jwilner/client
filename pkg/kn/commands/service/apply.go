@@ -24,6 +24,8 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"knative.dev/client/pkg/kn/commands"
+	"knative.dev/client/pkg/kn/commands/flags"
+	"knative.dev/client/pkg/kn/traffic"
 	clientservingv1 "knative.dev/client/pkg/serving/v1"
 )
 
@@ -46,6 +48,7 @@ kn service apply s0 --filename my-svc.yml
 func NewServiceApplyCommand(p *commands.KnParams) *cobra.Command {
 	var applyFlags ConfigurationEditFlags
 	var waitFlags commands.WaitFlags
+	var trafficFlags flags.Traffic
 
 	serviceApplyCommand := &cobra.Command{
 		Use:     "apply NAME",
@@ -75,6 +78,12 @@ func NewServiceApplyCommand(p *commands.KnParams) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if trafficFlags.Changed(cmd) {
+				service.Spec.Traffic, err = traffic.Compute(cmd, service.Spec.Traffic, &trafficFlags, service.Name)
+				if err != nil {
+					return err
+				}
+			}
 
 			client, err := p.NewServingClient(namespace)
 			if err != nil {
@@ -101,6 +110,7 @@ func NewServiceApplyCommand(p *commands.KnParams) *cobra.Command {
 	commands.AddNamespaceFlags(serviceApplyCommand.Flags(), false)
 	applyFlags.AddCreateFlags(serviceApplyCommand)
 	waitFlags.AddConditionWaitFlags(serviceApplyCommand, commands.WaitDefaultTimeout, "apply", "service", "ready")
+	trafficFlags.Add(serviceApplyCommand)
 	return serviceApplyCommand
 }
 
